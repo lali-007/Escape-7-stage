@@ -37,6 +37,11 @@ void Game::initialize() {
     inventory = std::make_unique<Inventory>(10);
     inventory->setFont(mainFont);
     createRooms();
+    std::cout << "Current Working Directory: " << std::filesystem::current_path() << std::endl;
+    std::cout << "Looking for assets at: " << std::filesystem::current_path() / "assets" << std::endl;
+    // --------------------------------
+    
+    bool fontLoaded = false;
     setupPuzzles();
     stateText.setFont(mainFont);
     stateText.setCharacterSize(30);

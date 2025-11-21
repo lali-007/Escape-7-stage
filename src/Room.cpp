@@ -1,43 +1,47 @@
 /*
  * Museum Escape - Room Class Implementation
  * CS/CE 224/272 - Fall 2025
- * SFML 3.0 COMPATIBLE
+ * SFML 3.0 COMPATIBLE (Fixed Background Display)
  */
 
 #include "Room.h"
 #include "Puzzle.h"
 #include "Item.h"
 #include "Guard.h"
+#include <iostream>
 
-// --- CHANGED: Constructor implementation to load image ---
+// Constructor
 Room::Room(int id, const std::string& name, float x, float y, float width, float height, const std::string& imagePath)
     : roomID(id),
       roomName(name),
       position(x, y),
       size(width, height),
-      bgSprite(bgTexture), // <--- FIXED: Initialize sprite with the texture member here
+      bgSprite(bgTexture), // Initialize sprite with texture
       isExitRoom(false),
       isVisited(false)
 {
     // Attempt to load background texture
     if (!bgTexture.loadFromFile(imagePath)) {
-        // Fallback if image missing: Create a colored background
+        // Fallback: Create a colored background if image fails
         sf::Image img;
-        // SFML 3.0: Use resize() instead of create()
+        // SFML 3.0 uses resize() instead of create()
         img.resize({static_cast<unsigned int>(width), static_cast<unsigned int>(height)}, sf::Color(40, 40, 50));
         
-        // Check result to fix [[nodiscard]] warning
         if (!bgTexture.loadFromImage(img)) {
-            std::cerr << "Error: Failed to create fallback texture for room " << id << std::endl;
+             std::cerr << "Error: Failed to create fallback texture." << std::endl;
         }
         std::cout << "Warning: Could not load " << imagePath << ". Using default color." << std::endl;
     }
     
-    // We don't need setTextur(bgTexture) because we did it in the initializer list.
+    // --- CRITICAL FIX START ---
+    // We must tell the sprite the new size of the texture, otherwise it draws nothing!
+    sf::Vector2u texSize = bgTexture.getSize();
+    bgSprite.setTextureRect(sf::IntRect({0, 0}, {static_cast<int>(texSize.x), static_cast<int>(texSize.y)}));
+    // --- CRITICAL FIX END ---
+
     bgSprite.setPosition(position);
     
-    // Scale sprite to fit the room dimensions if image size differs
-    sf::Vector2u texSize = bgTexture.getSize();
+    // Scale sprite to fit room dimensions exactly
     if (texSize.x > 0 && texSize.y > 0) {
         bgSprite.setScale({width / texSize.x, height / texSize.y});
     }
@@ -88,7 +92,7 @@ void Room::update(float deltaTime) {
 }
 
 void Room::draw(sf::RenderWindow& window) {
-    // --- CHANGED: Draw Sprite instead of Rectangle ---
+    // Draw the background image
     window.draw(bgSprite);
     
     for (auto& guard : guards) guard->draw(window, true);
@@ -116,7 +120,7 @@ Door::Door(float x, float y, int targetRoom, bool locked, const std::string& key
     sprite.setPosition(position);
     
     if (isLocked) sprite.setFillColor(sf::Color::Red);
-    else sprite.setFillColor(sf::Color(100, 100, 100)); // Gray
+    else sprite.setFillColor(sf::Color(100, 100, 100));
     
     sprite.setOutlineThickness(2.0f);
     sprite.setOutlineColor(sf::Color::White);
@@ -124,7 +128,7 @@ Door::Door(float x, float y, int targetRoom, bool locked, const std::string& key
 
 void Door::unlock() {
     isLocked = false;
-    sprite.setFillColor(sf::Color::Blue);
+    sprite.setFillColor(sf::Color::Blue); // Turn Blue when unlocked
 }
 
 bool Door::canOpen(const std::string& keyName) {
@@ -144,7 +148,7 @@ int Door::getTargetRoomID() const { return targetRoomID; }
 bool Door::getLockedStatus() const { return isLocked; }
 sf::FloatRect Door::getBounds() const { return sprite.getGlobalBounds(); }
 
-// --- NEW IMPLEMENTATIONS ---
+// --- Dynamic Color Logic ---
 std::string Door::getRequiredKey() const { return requiredKey; }
 void Door::setColor(const sf::Color& color) { sprite.setFillColor(color); }
 
