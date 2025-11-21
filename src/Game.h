@@ -48,6 +48,10 @@ private:
     sf::Font notificationFont; // Font for notifications
     sf::Music backgroundMusic;
     
+    // --- NEW: Texture Assets ---
+    sf::Texture playerTexture;
+    sf::Texture guardTexture;
+    
     // UI Elements (declared after fonts)
     sf::Text stateText; // Regular member, initialized in constructor
     sf::RectangleShape overlay; // Dark overlay for pause/puzzle screens
