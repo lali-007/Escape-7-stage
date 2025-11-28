@@ -70,6 +70,22 @@ public:
     void use() override; // Does nothing, just for collection
 };
 
+// Tool item - Special gameplay items (Flashlight, Bolt Cutters, etc.)
+class Tool : public Item {
+private:
+    std::string toolType; // "flashlight", "bolt_cutters", etc.
+    bool isActive;
+    
+public:
+    Tool(const std::string& toolName, const std::string& type, const std::string& desc, float x, float y);
+    
+    void use() override;
+    std::string getToolType() const;
+    void activate();
+    void deactivate();
+    bool isToolActive() const;
+};
+
 // Inventory class - Manages player's collected items
 class Inventory {
 private:
@@ -81,13 +97,14 @@ private:
     
 public:
     // Constructor
-    Inventory(int capacity = 10);
+    Inventory(int capacity = 15); // Increased capacity for more items
     
     // Item management
     bool addItem(std::shared_ptr<Item> item);
     bool removeItem(const std::string& itemName);
     bool hasItem(const std::string& itemName) const;
     std::shared_ptr<Item> getItem(const std::string& itemName);
+    bool hasTool(const std::string& toolType) const; // NEW: Check for specific tool
     
     // Inventory properties
     int getItemCount() const;

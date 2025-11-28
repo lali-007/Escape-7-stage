@@ -48,10 +48,6 @@ private:
     sf::Font notificationFont; // Font for notifications
     sf::Music backgroundMusic;
     
-    // --- NEW: Texture Assets ---
-    sf::Texture playerTexture;
-    sf::Texture guardTexture;
-    
     // UI Elements (declared after fonts)
     sf::Text stateText; // Regular member, initialized in constructor
     sf::RectangleShape overlay; // Dark overlay for pause/puzzle screens
@@ -118,6 +114,7 @@ private:
     void pauseGame();
     void resumeGame();
     void showNotification(const std::string& message, const sf::Color& color, float duration = 3.0f);
+    void showStoryText(int roomID);  // NEW: Display story text when entering rooms
 };
 
 #endif // GAME_H

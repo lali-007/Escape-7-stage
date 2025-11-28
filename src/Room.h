@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <iostream>
 
 class Puzzle;
 class Item;
@@ -16,12 +15,9 @@ class Room {
 private:
     int roomID;
     std::string roomName;
-    sf::Vector2f position;
+    sf::Vector2f position; // Position in world coordinates
     sf::Vector2f size;
-    
-    // --- CHANGED: Replaced simple background shape with Texture/Sprite ---
-    sf::Texture bgTexture;
-    sf::Sprite bgSprite;
+    sf::RectangleShape background;
     
     std::vector<std::shared_ptr<Puzzle>> puzzles;
     std::vector<std::shared_ptr<Item>> items;
@@ -32,8 +28,8 @@ private:
     bool isVisited;
     
 public:
-    // --- CHANGED: Added imagePath parameter ---
-    Room(int id, const std::string& name, float x, float y, float width, float height, const std::string& imagePath);
+    // Constructor
+    Room(int id, const std::string& name, float x, float y, float width, float height);
     
     // Puzzle management
     void addPuzzle(std::shared_ptr<Puzzle> puzzle);
@@ -93,10 +89,6 @@ public:
     int getTargetRoomID() const;
     bool getLockedStatus() const;
     sf::FloatRect getBounds() const;
-    
-    // --- NEW: Added getters/setters for logic in Game.cpp ---
-    std::string getRequiredKey() const;
-    void setColor(const sf::Color& color);
     
     void draw(sf::RenderWindow& window);
 };

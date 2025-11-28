@@ -7,20 +7,17 @@
 #include "Item.h"
 #include <SFML/Window/Keyboard.hpp>
 
-// Constructor - CHANGED to use Texture
-Player::Player(float x, float y, const sf::Texture& texture) 
+// Constructor
+Player::Player(float x, float y) 
     : position(x, y),
-      sprite(texture),  // <--- FIX: Initialize sprite HERE with the texture
       speed(200.0f),
       health(100),
       isWarned(false)
 {
-    // We don't need sprite.setTexture(texture) anymore because we did it above.
-    
+    // Setup player sprite (simple rectangle for now)
+    sprite.setSize({40.0f, 40.0f});
+    sprite.setFillColor(sf::Color::Green);
     sprite.setPosition(position);
-    
-    // If the sprite is too big, you can scale it here:
-    sprite.setScale({0.05f, 0.05f}); 
 }
 
 // Move player by delta amounts
@@ -133,5 +130,7 @@ void Player::draw(sf::RenderWindow& window) {
 
 // Update player (for animations, etc.)
 void Player::update(float deltaTime) {
+    // Future: Add animations, sprite updates, etc.
+    // For now, just update sprite position
     sprite.setPosition(position);
 }
