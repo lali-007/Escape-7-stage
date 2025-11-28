@@ -677,16 +677,81 @@ void Game::renderVictory() {
 }
 
 // Change to a different room
+// Change to a different room
 void Game::changeRoom(int newRoomID) {
     if (rooms.find(newRoomID) != rooms.end()) {
+        
+        float spawnX = 100.0f;
+        float spawnY = 300.0f;
+
+        // MANUAL COORDINATE CONFIGURATION
+        switch (newRoomID) {
+            case 1: // Entering Main Entrance
+                // You can only come back to Room 1 from Room 2
+                spawnX = 700.0f; 
+                spawnY = 300.0f;
+                break;
+
+            case 2: // Entering Ancient Artifacts
+                if (currentRoomID == 1) {
+                    // Coming from Room 1 (Left Door)
+                    spawnX = 100.0f; spawnY = 300.0f;
+                } else {
+                    // Coming from Room 3 (Right Door)
+                    spawnX = 700.0f; spawnY = 300.0f;
+                }
+                break;
+
+            case 3: // Entering Medieval Weapons
+                if (currentRoomID == 2) {
+                    spawnX = 100.0f; spawnY = 300.0f;
+                } else {
+                    spawnX = 700.0f; spawnY = 300.0f;
+                }
+                break;
+
+            case 4: // Entering Security Control
+                if (currentRoomID == 3) {
+                    spawnX = 100.0f; spawnY = 300.0f;
+                } else {
+                    spawnX = 700.0f; spawnY = 300.0f;
+                }
+                break;
+
+            case 5: // Entering Dark Archives
+                if (currentRoomID == 4) {
+                    spawnX = 10.0f; spawnY = 30.0f;
+                } else {
+                    spawnX = 700.0f; spawnY = 300.0f;
+                }
+                break;
+
+            case 6: // Entering Laboratory
+                if (currentRoomID == 5) {
+                    spawnX = 100.0f; spawnY = 300.0f;
+                } else {
+                    spawnX = 700.0f; spawnY = 300.0f;
+                }
+                break;
+
+            case 7: // Entering Director's Office
+                // Can only enter from Room 6
+                spawnX = 100.0f; 
+                spawnY = 300.0f;
+                break;
+        }
+
         currentRoomID = newRoomID;
         rooms[currentRoomID]->setVisited(true);
         
-        // Spawn player at safe position
-        player->setPosition(100.0f, 300.0f);
+        // Apply the manually set position
+        player->setPosition(spawnX, spawnY);
         
         // Show story text for new room
         showStoryText(newRoomID);
+        
+        // Trigger Solved Background if entering a previously solved room
+        // rooms[currentRoomID]->revealSolvedBackground();
         
         std::cout << "\n→ Entered: " << rooms[currentRoomID]->getRoomName() << std::endl;
     }
