@@ -15,9 +15,17 @@ class Room {
 private:
     int roomID;
     std::string roomName;
-    sf::Vector2f position; // Position in world coordinates
+    sf::Vector2f position;
     sf::Vector2f size;
-    sf::RectangleShape background;
+    
+    // === BACKGROUNDS ===
+    sf::RectangleShape background;       // Normal (Closed)
+    sf::RectangleShape solvedBackground; // Solved (Open)
+    
+    // Transition Logic
+    bool hasSolvedTexture;
+    bool isTransitioning;
+    float transitionAlpha; // 0.0f (Invisible) to 255.0f (Fully Visible)
     
     std::vector<std::shared_ptr<Puzzle>> puzzles;
     std::vector<std::shared_ptr<Item>> items;
@@ -28,31 +36,29 @@ private:
     bool isVisited;
     
 public:
-    // Constructor
     Room(int id, const std::string& name, float x, float y, float width, float height);
     
-    // Background management - THIS WAS THE NEW ADDITION
     void setBackgroundTexture(const sf::Texture& texture);
+    
+    // === NEW METHODS ===
+    void setSolvedBackgroundTexture(const sf::Texture& texture); // Load the open image
+    void revealSolvedBackground(); // Start the fade-in effect
+    void forceSolvedBackground();  // Show immediately (for when re-entering room)
 
-    // Puzzle management
     void addPuzzle(std::shared_ptr<Puzzle> puzzle);
     std::vector<std::shared_ptr<Puzzle>>& getPuzzles();
     bool allPuzzlesSolved() const;
     
-    // Item management
     void addItem(std::shared_ptr<Item> item);
     void removeItem(std::shared_ptr<Item> item);
     std::vector<std::shared_ptr<Item>>& getItems();
     
-    // Guard management
     void addGuard(std::shared_ptr<Guard> guard);
     std::vector<std::shared_ptr<Guard>>& getGuards();
     
-    // Door management
     void addDoor(std::shared_ptr<Door> door);
     std::vector<std::shared_ptr<Door>>& getDoors();
     
-    // Room properties
     int getRoomID() const;
     std::string getRoomName() const;
     sf::Vector2f getPosition() const;
@@ -65,22 +71,20 @@ public:
     void setVisited(bool visited);
     bool hasBeenVisited() const;
     
-    // Update and render
     void update(float deltaTime);
     void draw(sf::RenderWindow& window);
     
-    // Collision check
     bool containsPoint(const sf::Vector2f& point) const;
 };
 
-// Door class - Connects rooms
+// Door class remains mostly logic-based now
 class Door {
 private:
     sf::Vector2f position;
     sf::RectangleShape sprite;
     int targetRoomID;
     bool isLocked;
-    std::string requiredKey; // Key name required to unlock
+    std::string requiredKey;
     
 public:
     Door(float x, float y, int targetRoom, bool locked = false, const std::string& keyName = "");
