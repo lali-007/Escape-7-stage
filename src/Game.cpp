@@ -1,16 +1,10 @@
 /*
- * Museum Escape - Game Class Implementation (PHASE 1 ENHANCED)
+ * Museum Escape - Game Class Implementation
  * CS/CE 224/272 - Fall 2025
- * 
- * Phase 1 Additions:
- * - 7 rooms (was 5)
- * - Flashlight tool (required for Room 5)
- * - Bolt Cutters tool (required for Room 6)
- * - Story text for each room
- * - Enhanced item system
  */
 
 #include "Game.h"
+#include "Room.h"    // <--- Explicitly include this to fix "incomplete type Room"
 #include "Puzzle.h"
 #include "Guard.h"
 #include "Item.h"
@@ -82,10 +76,11 @@ void Game::initialize() {
     std::cout << "Game initialized successfully!" << std::endl;
 }
 
-// Load fonts, sounds, music
+// Load fonts, sounds, music AND TEXTURES
 void Game::loadAssets() {
     bool fontLoaded = false;
     
+    // Try multiple paths for the font
     if (mainFont.openFromFile("assets/arial.ttf")) {
         fontLoaded = true;
     } else if (mainFont.openFromFile("arial.ttf")) {
@@ -98,6 +93,25 @@ void Game::loadAssets() {
         std::cerr << "Warning: Could not load font from any path!" << std::endl;
     } else {
         std::cout << "Font loaded successfully!" << std::endl;
+    }
+    
+    // === Load Room Backgrounds ===
+    // This requires the roomTextures map to be defined in Game.h
+    for (int i = 1; i <= 7; ++i) {
+        sf::Texture texture;
+        std::string filenamePNG = "assets/room" + std::to_string(i) + ".png";
+        std::string filenameJPG = "assets/room" + std::to_string(i) + ".jpg";
+        
+        // Try PNG first, then JPG
+        if (texture.loadFromFile(filenamePNG)) {
+            roomTextures[i] = texture;
+            std::cout << "Loaded background: " << filenamePNG << std::endl;
+        } else if (texture.loadFromFile(filenameJPG)) {
+            roomTextures[i] = texture;
+            std::cout << "Loaded background: " << filenameJPG << std::endl;
+        } else {
+            std::cerr << "Warning: Could not load background for room " << i << " (checked .png and .jpg)" << std::endl;
+        }
     }
     
     std::cout << "Assets loaded!" << std::endl;
@@ -120,7 +134,7 @@ void Game::createRooms() {
         "Shows the layout of the museum", 650.0f, 150.0f);
     room1->addItem(map);
     
-    // Add 1 guard (easy patrol) - FIXED: Avoid door areas
+    // Add 1 guard (easy patrol)
     auto guard1 = std::make_shared<Guard>(400.0f, 200.0f, 100.0f);
     guard1->addPatrolPoint(400.0f, 200.0f);
     guard1->addPatrolPoint(600.0f, 200.0f);
@@ -135,7 +149,7 @@ void Game::createRooms() {
     // ========================================================================
     auto room2 = std::make_shared<Room>(2, "Ancient Artifacts Gallery", 0, 0, 800, 600);
     
-    // Add 1 guard (medium difficulty) - FIXED: Start away from doors
+    // Add 1 guard (medium difficulty)
     auto guard2 = std::make_shared<Guard>(400.0f, 450.0f, 110.0f);
     guard2->addPatrolPoint(400.0f, 450.0f);
     guard2->addPatrolPoint(400.0f, 150.0f);
@@ -155,12 +169,12 @@ void Game::createRooms() {
         "Cuts through chains and wires", 650.0f, 500.0f);
     room3->addItem(boltCutters);
     
-    // Add Red Keycard (collectible - not needed for progression)
+    // Add Red Keycard (collectible)
     auto redCard = std::make_shared<BasicItem>("Red Keycard",
         "An old security card", 150.0f, 150.0f);
     room3->addItem(redCard);
     
-    // Add 1 guard - FIXED: Safe starting position
+    // Add 1 guard
     auto guard3 = std::make_shared<Guard>(400.0f, 200.0f, 100.0f);
     guard3->addPatrolPoint(400.0f, 200.0f);
     guard3->addPatrolPoint(600.0f, 200.0f);
@@ -175,11 +189,11 @@ void Game::createRooms() {
     // ========================================================================
     auto room4 = std::make_shared<Room>(4, "Security Control Room", 0, 0, 800, 600);
     
-    // Add Access Code Note (shows code for lock puzzle)
+    // Add Access Code Note
     auto codeNote = std::make_shared<Passcode>("Access Code Note", "4738", 150.0f, 500.0f);
     room4->addItem(codeNote);
     
-    // Add 2 guards (HARD - crossing patrols!) - FIXED: Avoid door spawn areas
+    // Add 2 guards (HARD)
     auto guard4a = std::make_shared<Guard>(300.0f, 150.0f, 110.0f);
     guard4a->addPatrolPoint(300.0f, 150.0f);
     guard4a->addPatrolPoint(600.0f, 150.0f);
@@ -197,12 +211,12 @@ void Game::createRooms() {
     // ========================================================================
     auto room5 = std::make_shared<Room>(5, "Dark Archives", 0, 0, 800, 600);
     
-    // Add Encrypted Note (hints for Room 6)
+    // Add Encrypted Note
     auto encryptedNote = std::make_shared<BasicItem>("Encrypted Note",
         "Wire sequence: Primary colors first, then secondary", 650.0f, 150.0f);
     room5->addItem(encryptedNote);
     
-    // Add 1 guard with flashlight (can see further in dark) - FIXED: Safe patrol
+    // Add 1 guard with flashlight
     auto guard5 = std::make_shared<Guard>(400.0f, 400.0f, 120.0f);
     guard5->addPatrolPoint(400.0f, 400.0f);
     guard5->addPatrolPoint(600.0f, 400.0f);
@@ -217,12 +231,12 @@ void Game::createRooms() {
     // ========================================================================
     auto room6 = std::make_shared<Room>(6, "Laboratory", 0, 0, 800, 600);
     
-    // Add Evidence Log (collectible)
+    // Add Evidence Log
     auto evidenceLog = std::make_shared<BasicItem>("Evidence Log",
         "Documents showing illegal experiments", 150.0f, 150.0f);
     room6->addItem(evidenceLog);
     
-    // Add 2 guards (aggressive patrols) - FIXED: Safe starting positions
+    // Add 2 guards
     auto guard6a = std::make_shared<Guard>(400.0f, 200.0f, 115.0f);
     guard6a->addPatrolPoint(400.0f, 200.0f);
     guard6a->addPatrolPoint(600.0f, 200.0f);
@@ -236,7 +250,7 @@ void Game::createRooms() {
     rooms[6] = room6;
     
     // ========================================================================
-    // Room 7: Director's Office (FINAL ROOM - Victory!)
+    // Room 7: Director's Office (FINAL ROOM)
     // ========================================================================
     auto room7 = std::make_shared<Room>(7, "Director's Office", 0, 0, 800, 600);
     
@@ -245,7 +259,7 @@ void Game::createRooms() {
         "The proof you need to expose the conspiracy!", 400.0f, 300.0f);
     room7->addItem(evidenceFile);
     
-    // Add Personal Journal (collectible)
+    // Add Personal Journal
     auto journal = std::make_shared<BasicItem>("Personal Journal",
         "The Director's personal notes", 650.0f, 150.0f);
     room7->addItem(journal);
@@ -256,7 +270,7 @@ void Game::createRooms() {
     rooms[7] = room7;
     
     // ========================================================================
-    // Connect Rooms - ENHANCED FLOW
+    // Connect Rooms
     // ========================================================================
     
     // Room 1 → Room 2
@@ -282,8 +296,18 @@ void Game::createRooms() {
     room6->addDoor(std::make_shared<Door>(50.0f, 300.0f, 5, false, ""));
     room6->addDoor(std::make_shared<Door>(750.0f, 300.0f, 7, true, "master_keycard"));
     
-    // Room 7 - Back door (no exit needed - win condition is picking up Evidence File)
+    // Room 7 Back door
     room7->addDoor(std::make_shared<Door>(50.0f, 300.0f, 6, false, ""));
+    
+    // ========================================================================
+    // APPLY TEXTURES (if loaded)
+    // ========================================================================
+    for (auto& pair : rooms) {
+        int id = pair.first;
+        if (roomTextures.find(id) != roomTextures.end()) {
+            pair.second->setBackgroundTexture(roomTextures[id]);
+        }
+    }
     
     std::cout << "\n=== ENHANCED MUSEUM STRUCTURE ===" << std::endl;
     std::cout << "Room 1: Main Entrance (Get Flashlight!)" << std::endl;
@@ -296,14 +320,14 @@ void Game::createRooms() {
     std::cout << "==================================\n" << std::endl;
 }
 
-// Setup puzzles in rooms - PHASE 2 COMPLETE
+// Setup puzzles in rooms
 void Game::setupPuzzles() {
     // Room 2: Pattern Puzzle (reward: Blue Keycard)
     auto patternPuzzle = std::make_shared<PatternPuzzle>(std::vector<int>{1, 3, 2, 4});
     patternPuzzle->setFont(mainFont);
     rooms[2]->addPuzzle(patternPuzzle);
     
-    // Room 3: Riddle Puzzle (reward spawns after solving)
+    // Room 3: Riddle Puzzle
     auto riddle = std::make_shared<RiddlePuzzle>(
         "I speak without a mouth and hear without ears.\nI have no body, but come alive with wind.\nWhat am I?",
         "echo"
@@ -316,12 +340,12 @@ void Game::setupPuzzles() {
     lockPuzzle->setFont(mainFont);
     rooms[4]->addPuzzle(lockPuzzle);
     
-    // PHASE 2: Room 5 - Math Puzzle (reward: Green Keycard)
+    // Room 5: Math Puzzle (reward: Green Keycard)
     auto mathPuzzle = std::make_shared<MathPuzzle>("(60 - 12) = ?", "048");
     mathPuzzle->setFont(mainFont);
     rooms[5]->addPuzzle(mathPuzzle);
     
-    // PHASE 2: Room 6 - Wire Puzzle (reward: Master Keycard)
+    // Room 6: Wire Puzzle (reward: Master Keycard)
     auto wirePuzzle = std::make_shared<WirePuzzle>(
         std::vector<std::string>{"Red", "Yellow", "Blue", "Green", "Purple"}
     );
@@ -329,12 +353,7 @@ void Game::setupPuzzles() {
     wirePuzzle->setBoltCutters(false); // Will be enabled when player has bolt cutters
     rooms[6]->addPuzzle(wirePuzzle);
     
-    std::cout << "All Puzzles setup (Phase 2 Complete):" << std::endl;
-    std::cout << "  Room 2: Pattern Puzzle → Blue Keycard" << std::endl;
-    std::cout << "  Room 3: Riddle Puzzle" << std::endl;
-    std::cout << "  Room 4: Lock Puzzle → Yellow Keycard" << std::endl;
-    std::cout << "  Room 5: Math Puzzle → Green Keycard" << std::endl;
-    std::cout << "  Room 6: Wire Puzzle → Master Keycard" << std::endl;
+    std::cout << "All Puzzles setup complete." << std::endl;
 }
 
 // Main game loop
@@ -441,13 +460,13 @@ void Game::handlePuzzleInput(const sf::Event& event) {
                 showNotification("Yellow Keycard appeared! Check bottom-right corner!", sf::Color::Yellow, 4.0f);
                 std::cout << "🔑 YELLOW KEYCARD unlocked! (Unlocks Room 5 - Dark Archives)" << std::endl;
             } else if (currentRoomID == 5) {
-                // PHASE 2: Room 5 Math Puzzle → Green Keycard
+                // Room 5 Math Puzzle → Green Keycard
                 auto greenCard = std::make_shared<Key>("Green Keycard", "green_keycard", 650.0f, 500.0f);
                 rooms[5]->addItem(greenCard);
                 showNotification("Green Keycard appeared! Safe unlocked!", sf::Color::Green, 4.0f);
                 std::cout << "🔑 GREEN KEYCARD unlocked! (Unlocks Room 6 - Laboratory)" << std::endl;
             } else if (currentRoomID == 6) {
-                // PHASE 2: Room 6 Wire Puzzle → Master Keycard
+                // Room 6 Wire Puzzle → Master Keycard
                 auto masterCard = std::make_shared<Key>("Master Keycard", "master_keycard", 650.0f, 500.0f);
                 rooms[6]->addItem(masterCard);
                 showNotification("Master Keycard appeared! Alarm disabled!", sf::Color(255, 215, 0), 4.0f);

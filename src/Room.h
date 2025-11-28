@@ -31,6 +31,9 @@ public:
     // Constructor
     Room(int id, const std::string& name, float x, float y, float width, float height);
     
+    // Background management - THIS WAS THE NEW ADDITION
+    void setBackgroundTexture(const sf::Texture& texture);
+
     // Puzzle management
     void addPuzzle(std::shared_ptr<Puzzle> puzzle);
     std::vector<std::shared_ptr<Puzzle>>& getPuzzles();

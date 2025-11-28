@@ -20,9 +20,15 @@ Room::Room(int id, const std::string& name, float x, float y, float width, float
     // Setup room background
     background.setSize({width, height});
     background.setPosition(position);
-    background.setFillColor(sf::Color(40, 40, 50)); // Dark blue-gray
+    background.setFillColor(sf::Color(40, 40, 50)); // Default Dark blue-gray if no texture
     background.setOutlineThickness(2.0f);
     background.setOutlineColor(sf::Color::White);
+}
+
+// Set background texture
+void Room::setBackgroundTexture(const sf::Texture& texture) {
+    background.setTexture(&texture);
+    background.setFillColor(sf::Color::White); // Reset color to White so texture shows clearly
 }
 
 // Add puzzle to room

@@ -5,7 +5,7 @@
 #include <SFML/Audio.hpp>
 #include <memory>
 #include <vector>
-#include <map>
+#include <map>        // <--- IMPORTANT: Required for std::map
 #include "Player.h"
 #include "Room.h"
 #include "Timer.h"
@@ -37,6 +37,11 @@ private:
     
     // Rooms
     std::map<int, std::shared_ptr<Room>> rooms;
+    
+    // === THIS IS THE MISSING VARIABLE CAUSING YOUR ERROR ===
+    std::map<int, sf::Texture> roomTextures; 
+    // ======================================================
+
     int currentRoomID;
     
     // Active puzzle (when player interacts with one)
