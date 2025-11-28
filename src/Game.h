@@ -5,7 +5,7 @@
 #include <SFML/Audio.hpp>
 #include <memory>
 #include <vector>
-#include <map>        // <--- IMPORTANT: Required for std::map
+#include <map>
 #include "Player.h"
 #include "Room.h"
 #include "Timer.h"
@@ -37,24 +37,23 @@ private:
     
     // Rooms
     std::map<int, std::shared_ptr<Room>> rooms;
-    
-    // === THIS IS THE MISSING VARIABLE CAUSING YOUR ERROR ===
     std::map<int, sf::Texture> roomTextures; 
-    // ======================================================
 
     int currentRoomID;
     
     // Active puzzle (when player interacts with one)
     std::shared_ptr<Puzzle> activePuzzle;
     
-    // Assets (must be declared before Text objects that use them)
+    // Assets
+    sf::Texture playerTexture;
+    sf::Texture guardTexture;
     sf::Font mainFont;
     sf::Font defaultFont; // Default font for initialization
     sf::Font notificationFont; // Font for notifications
     sf::Music backgroundMusic;
     
-    // UI Elements (declared after fonts)
-    sf::Text stateText; // Regular member, initialized in constructor
+    // UI Elements
+    sf::Text stateText;
     sf::RectangleShape overlay; // Dark overlay for pause/puzzle screens
     
     // Notification system
@@ -119,7 +118,7 @@ private:
     void pauseGame();
     void resumeGame();
     void showNotification(const std::string& message, const sf::Color& color, float duration = 3.0f);
-    void showStoryText(int roomID);  // NEW: Display story text when entering rooms
+    void showStoryText(int roomID);
 };
 
 #endif // GAME_H

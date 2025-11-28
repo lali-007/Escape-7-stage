@@ -4,7 +4,7 @@
  */
 
 #include "Game.h"
-#include "Room.h"    // <--- Explicitly include this to fix "incomplete type Room"
+#include "Room.h"
 #include "Puzzle.h"
 #include "Guard.h"
 #include "Item.h"
@@ -36,8 +36,8 @@ void Game::initialize() {
     // Load assets FIRST
     loadAssets();
     
-    // Create player
-    player = std::make_unique<Player>(100.0f, 100.0f);
+    // Create player (Pass the texture)
+    player = std::make_unique<Player>(100.0f, 100.0f, playerTexture);
     
     // Create timer (10 minutes = 600 seconds)
     gameTimer = std::make_unique<Timer>(600.0f);
@@ -95,8 +95,20 @@ void Game::loadAssets() {
         std::cout << "Font loaded successfully!" << std::endl;
     }
     
+    // === Load Character Sprites ===
+    if (playerTexture.loadFromFile("assets/player.png")) {
+        std::cout << "Loaded player texture." << std::endl;
+    } else {
+        std::cerr << "Failed to load assets/player.png" << std::endl;
+    }
+
+    if (guardTexture.loadFromFile("assets/guard.png")) {
+        std::cout << "Loaded guard texture." << std::endl;
+    } else {
+        std::cerr << "Failed to load assets/guard.png" << std::endl;
+    }
+    
     // === Load Room Backgrounds ===
-    // This requires the roomTextures map to be defined in Game.h
     for (int i = 1; i <= 7; ++i) {
         sf::Texture texture;
         std::string filenamePNG = "assets/room" + std::to_string(i) + ".png";
@@ -135,7 +147,8 @@ void Game::createRooms() {
     room1->addItem(map);
     
     // Add 1 guard (easy patrol)
-    auto guard1 = std::make_shared<Guard>(400.0f, 200.0f, 100.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard1 = std::make_shared<Guard>(400.0f, 200.0f, 100.0f, guardTexture);
     guard1->addPatrolPoint(400.0f, 200.0f);
     guard1->addPatrolPoint(600.0f, 200.0f);
     guard1->addPatrolPoint(600.0f, 400.0f);
@@ -150,7 +163,8 @@ void Game::createRooms() {
     auto room2 = std::make_shared<Room>(2, "Ancient Artifacts Gallery", 0, 0, 800, 600);
     
     // Add 1 guard (medium difficulty)
-    auto guard2 = std::make_shared<Guard>(400.0f, 450.0f, 110.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard2 = std::make_shared<Guard>(400.0f, 450.0f, 110.0f, guardTexture);
     guard2->addPatrolPoint(400.0f, 450.0f);
     guard2->addPatrolPoint(400.0f, 150.0f);
     guard2->addPatrolPoint(600.0f, 150.0f);
@@ -175,7 +189,8 @@ void Game::createRooms() {
     room3->addItem(redCard);
     
     // Add 1 guard
-    auto guard3 = std::make_shared<Guard>(400.0f, 200.0f, 100.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard3 = std::make_shared<Guard>(400.0f, 200.0f, 100.0f, guardTexture);
     guard3->addPatrolPoint(400.0f, 200.0f);
     guard3->addPatrolPoint(600.0f, 200.0f);
     guard3->addPatrolPoint(600.0f, 450.0f);
@@ -194,12 +209,14 @@ void Game::createRooms() {
     room4->addItem(codeNote);
     
     // Add 2 guards (HARD)
-    auto guard4a = std::make_shared<Guard>(300.0f, 150.0f, 110.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard4a = std::make_shared<Guard>(300.0f, 150.0f, 110.0f, guardTexture);
     guard4a->addPatrolPoint(300.0f, 150.0f);
     guard4a->addPatrolPoint(600.0f, 150.0f);
     room4->addGuard(guard4a);
     
-    auto guard4b = std::make_shared<Guard>(600.0f, 450.0f, 110.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard4b = std::make_shared<Guard>(600.0f, 450.0f, 110.0f, guardTexture);
     guard4b->addPatrolPoint(600.0f, 450.0f);
     guard4b->addPatrolPoint(300.0f, 450.0f);
     room4->addGuard(guard4b);
@@ -217,7 +234,8 @@ void Game::createRooms() {
     room5->addItem(encryptedNote);
     
     // Add 1 guard with flashlight
-    auto guard5 = std::make_shared<Guard>(400.0f, 400.0f, 120.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard5 = std::make_shared<Guard>(400.0f, 400.0f, 120.0f, guardTexture);
     guard5->addPatrolPoint(400.0f, 400.0f);
     guard5->addPatrolPoint(600.0f, 400.0f);
     guard5->addPatrolPoint(600.0f, 200.0f);
@@ -237,12 +255,14 @@ void Game::createRooms() {
     room6->addItem(evidenceLog);
     
     // Add 2 guards
-    auto guard6a = std::make_shared<Guard>(400.0f, 200.0f, 115.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard6a = std::make_shared<Guard>(400.0f, 200.0f, 115.0f, guardTexture);
     guard6a->addPatrolPoint(400.0f, 200.0f);
     guard6a->addPatrolPoint(600.0f, 200.0f);
     room6->addGuard(guard6a);
     
-    auto guard6b = std::make_shared<Guard>(600.0f, 450.0f, 115.0f);
+    // CHANGED: Order is now (x, y, range, texture)
+    auto guard6b = std::make_shared<Guard>(600.0f, 450.0f, 115.0f, guardTexture);
     guard6b->addPatrolPoint(600.0f, 450.0f);
     guard6b->addPatrolPoint(400.0f, 450.0f);
     room6->addGuard(guard6b);
